@@ -256,7 +256,7 @@ function circle(ctx, item, seats) {
 function render() {
     var ctx = document.getElementById('floorplan').getContext('2d');
     ctx.beginPath();
-    //ctx.clearRect(0,0,500,500);
+    ctx.clearRect(0,0,500,480);
     var tables = (room===0)?insideTables:outsideTables;
     tables.forEach(function (item) {
         if (item.type === "r2") drawV(ctx, item, 2);
