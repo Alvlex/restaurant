@@ -1,6 +1,6 @@
 var root2 = Math.sqrt(2);
-var insideTables = Array();
-var outsideTables = Array();
+var insideTables = [];
+var outsideTables = [];
 
 var tablesize=40;
 var seatsize=6;
@@ -53,38 +53,54 @@ function initData() {
     outsideTables[14] = {type:"c4", x:120, y:300};
 
     var tableid=1;
-    for (var j = 1; j < insideTables.length; j++, tableid++){
+    var j;
+    for (j = 1; j < insideTables.length; j++, tableid++){
         insideTables[j].width = 60;
         insideTables[j].height = 60;
         insideTables[j].count = j;
         insideTables[j].id = String(tableid);
         insideTables[j].comment = "";
-        if (insideTables[j].type == "r4") insideTables[j].height = 70;
-        else if (insideTables[j].type == "r6") insideTables[j].height = 80;
-        else if (insideTables[j].type == "R4") insideTables[j].width = 70;
-        else if (insideTables[j].type == "R6") insideTables[j].width = 80;
+        if (insideTables[j].type === "r4") insideTables[j].height = 70;
+        else if (insideTables[j].type === "r6") insideTables[j].height = 80;
+        else if (insideTables[j].type === "R4") insideTables[j].width = 70;
+        else if (insideTables[j].type === "R6") insideTables[j].width = 80;
     }
 
-    for (var j = 1; j < outsideTables.length; j++, tableid++){
+    for (j = 1; j < outsideTables.length; j++, tableid++){
         outsideTables[j].width = 60;
         outsideTables[j].height = 60;
         outsideTables[j].count = j;
-        if (tableid == 25) tableid=30;
-        else if (tableid == 34) tableid=40;
-        else if (tableid == 44) tableid=50;
+        if (tableid === 25) tableid=30;
+        else if (tableid === 34) tableid=40;
+        else if (tableid === 44) tableid=50;
         outsideTables[j].id = String(tableid);
         outsideTables[j].comment = "";
-        if (outsideTables[j].type == "r4") outsideTables[j].height = 70;
-        else if (outsideTables[j].type == "r6") outsideTables[j].height = 80;
-        else if (outsideTables[j].type == "R4") outsideTables[j].width = 70;
-        else if (outsideTables[j].type == "R6") outsideTables[j].width = 80;
+        if (outsideTables[j].type === "r4") outsideTables[j].height = 70;
+        else if (outsideTables[j].type === "r6") outsideTables[j].height = 80;
+        else if (outsideTables[j].type === "R4") outsideTables[j].width = 70;
+        else if (outsideTables[j].type === "R6") outsideTables[j].width = 80;
     }
 }
-function addKey(ctx, x, y) {
-    ctx.font = "14px Arial";
-    var offset=(item.width)/2-4*item.id.length;
-    ctx.fillText(item.id, item.x+offset, item.y+item.height/2 + 5);
+function addKey(x, y) {
+    var ctx = document.getElementById('floorplan').getContext('2d');
+    ctx.beginPath();
 
+    ctx.font = "14px Arial";
+    ctx.fillStyle="#ff95bf";
+    ctx.fillRect(x,y,10,10);
+    ctx.fillStyle="#000000";
+    ctx.fillText("Bookings with comments", x+15, y+10);
+    y+= 15;
+    ctx.fillStyle="#24c12e";
+    ctx.fillRect(x,y,10,10);
+    ctx.fillStyle="#000000";
+    ctx.fillText("Bookings without comments", x+15, y+10);
+    y+= 15;
+    ctx.fillStyle="#bebebe";
+    ctx.fillRect(x,y,10,10);
+    ctx.fillStyle="#000000";
+    ctx.fillText("No bookings yet", x+15, y+10);
+    ctx.fillStyle="#000000";
 }
 function label(ctx, item) {
     ctx.font = "14px Arial";
@@ -100,7 +116,7 @@ function drawHSeats(ctx, x, y) {
     ctx.rect(x, y-seatsize, seatsize, seatsize);
     ctx.rect(x, y+tablesize, seatsize, seatsize);
 }
-
+/*
 function rect(ctx, item, seats, orientation) {
     var x = item.x + gapsize;
     var y = item.y + gapsize;
@@ -141,6 +157,7 @@ function rect(ctx, item, seats, orientation) {
     ctx.stroke();
     label(ctx, item);
 }
+*/
 /*
  if (item.comment != "") {
  ctx.fillStyle="#ff95bf";
@@ -221,6 +238,7 @@ function circle(ctx, item, seats) {
     if (seats > 4) {
         var offsetplus = (tablesize+seatsize)/(2*root2);
         var offsetminus = (tablesize-seatsize)/(2*root2);
+        //noinspection FallThroughInSwitchStatementJS
         switch(seats) {
             case 8:
                 drawSeatAngle(ctx, xcentre - offsetminus - seatsize*root2, ycentre+offsetplus);
@@ -238,21 +256,21 @@ function circle(ctx, item, seats) {
 function render() {
     var ctx = document.getElementById('floorplan').getContext('2d');
     ctx.beginPath();
-    ctx.clearRect(0,0,500,500);
-    var tables = (room==0)?insideTables:outsideTables;
+    //ctx.clearRect(0,0,500,500);
+    var tables = (room===0)?insideTables:outsideTables;
     tables.forEach(function (item) {
-        if (item.type == "r2") drawV(ctx, item, 2);
-        else if (item.type == "r4") drawV(ctx, item, 4);
-        else if (item.type == "r6") drawV(ctx, item, 6);
-        else if (item.type == "R2") drawH(ctx, item, 2);
-        else if (item.type == "R4") drawH(ctx, item, 4);
-        else if (item.type == "R6") drawH(ctx, item, 6);
-        else if (item.type == "c4") circle(ctx, item, 4);
-        else if (item.type == "c5") circle(ctx, item, 5);
-        else if (item.type == "c6") circle(ctx, item, 6);
-        else if (item.type == "c7") circle(ctx, item, 7);
-        else if (item.type == "c8") circle(ctx, item, 8);
-        if (selected == item.count) {
+        if (item.type === "r2") drawV(ctx, item, 2);
+        else if (item.type === "r4") drawV(ctx, item, 4);
+        else if (item.type === "r6") drawV(ctx, item, 6);
+        else if (item.type === "R2") drawH(ctx, item, 2);
+        else if (item.type === "R4") drawH(ctx, item, 4);
+        else if (item.type === "R6") drawH(ctx, item, 6);
+        else if (item.type === "c4") circle(ctx, item, 4);
+        else if (item.type === "c5") circle(ctx, item, 5);
+        else if (item.type === "c6") circle(ctx, item, 6);
+        else if (item.type === "c7") circle(ctx, item, 7);
+        else if (item.type === "c8") circle(ctx, item, 8);
+        if (selected === item.count) {
             ctx.rect(item.x, item.y, item.width, item.height);
             ctx.stroke();
 
@@ -286,7 +304,7 @@ function addCanvasEvents() {
 //        document.getElementById("xyparent").innerHTML = "Parent: " + parentOffset.left + "," + parentOffset.top;
 
         selected = 0;
-        var tables = (room==0)?insideTables:outsideTables;
+        var tables = (room===0)?insideTables:outsideTables;
 
         tables.forEach(function (item) {
             if ((mx > item.x) && (my > item.y) && (mx < item.x + item.width) && (my < item.y + item.height)) {

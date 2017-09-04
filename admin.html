@@ -15,7 +15,7 @@ function getAdminTimes() {
     var size = document.getElementById("size").value;
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
+        if (this.readyState === 4 && this.status === 200) {
             var response = JSON.parse(this.responseText);
             var len, i, text;
             len = response.Timeslots.length;
@@ -36,7 +36,7 @@ function getAll() {
     var date = document.getElementById("datepicker").value;
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
+        if (this.readyState === 4 && this.status === 200) {
             var response = JSON.parse(this.responseText);
             var len, i, text;
             text = "";
@@ -64,6 +64,7 @@ function setDatePicker(id) {
 function init() {
 
     initData();
+    addKey(0,500);
     setDatePicker("#datepicker");
     addCanvasEvents();
     inside();
