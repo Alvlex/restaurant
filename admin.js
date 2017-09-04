@@ -47,7 +47,6 @@ function initData() {
     outsideTables[9] = {type:"r4", x:120, y:0};
     outsideTables[10] = {type:"r4", x:120, y:60};
     outsideTables[11] = {type:"r4", x:120, y:120};
-
     outsideTables[12] = {type:"r4", x:120, y:180};
     outsideTables[13] = {type:"r4", x:120, y:240};
     outsideTables[14] = {type:"c4", x:120, y:300};
@@ -255,7 +254,7 @@ function render() {
         if (selected == item.count) {
             ctx.rect(item.x, item.y, item.width, item.height);
             ctx.stroke();
-
+            
         }
     });
 }
