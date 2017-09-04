@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Restaurant Demo</title>
+        <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+        <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+        <script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+        <script src="http://www.datejs.com/build/date.js" type="text/javascript"></script>
+        <script src="admin.js" type="text/javascript"></script>
+        <script src="booking.js" type="text/javascript"></script>
+        <script>
+/*
+function getAdminTimes() {
+    var date = document.getElementById("datepicker").value;
+    var size = document.getElementById("size").value;
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var response = JSON.parse(this.responseText);
+            var len, i, text;
+            len = response.Timeslots.length;
+            text = "";
+            for (i = 0; i < len; i++) {
+                text += "<tr><td><button onclick=\"book('" + response.Timeslots[i] + "','" + size + "')\">Book for " + response.Timeslots[i] + "</button></td></tr>";
+            }
+            document.getElementById("output").innerHTML = "<input type='hidden' id='datepicker' value='" + date + "'/><input type='hidden' id='email' value='Restaurant'/><br/><table>" + text + "</table>";
+            document.getElementById("status").innerHTML = "" + len + " available slots for " + size + " people on " + date + ". Click on time to reserve for phone booking";
+        }
+    };
+    xhttp.open("GET", "https://msjhgasjyb.execute-api.eu-west-2.amazonaws.com/beta/demo/website?Size=" + size + "&Date=" + convertToISODate(date), true);
+    xhttp.setRequestHeader("Content-type", "application/json");
+
+    xhttp.send();
+}
+function getAll() {
+    var date = document.getElementById("datepicker").value;
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var response = JSON.parse(this.responseText);
+            var len, i, text;
+            text = "";
+            len = response.length;
+            for (i = 0; i < len; i++) {
+                text += "<tr><td>" + response[i].Time +
+                    "</td><td>" + response[i].Size +
+                    "</td><td>" + response[i].Email + "</td></tr>";
+            }
+            document.getElementById("output").innerHTML = "<table><tr><th>Time</th><th>Size</th><th>Email</th></tr>" + text + "</table>";
+            document.getElementById("status").innerHTML = "" + len + " bookings found for " + date;
+        }
+    };
+    xhttp.open("GET", "https://msjhgasjyb.execute-api.eu-west-2.amazonaws.com/beta/demo/website?Date=" + convertToISODate(date), true);
+    xhttp.setRequestHeader("Content-type", "application/json");
+
+    xhttp.send();
+}
+*/
+function setDatePicker(id) {
+    $( id ).datepicker();
+    $( id ).datepicker( "option", "dateFormat", "dd MM yy" );
+    $( id ).datepicker( "option", "minDate", 0);
+//    $( id ).datepicker( "option", "maxDate", new Date(2017, 7, 20) );
+}
+function switchGetBooking() {
+    document.getElementById("output").innerHTML =
+        "<table><tr><td>Id:</td><td><input type='text' id='id'/></td></tr>" +
+        "<tr><td>Email:</td><td><input type='text' id='email'/></td></tr>" +
+        "<tr><td colspan='2'><button onclick='getBooking()'>Show Booking</button></td></tr></table>";
+    document.getElementById("status").innerHTML = "Enter id and email to see the details of your booking";
+}
+function switchCreateBooking() {
+    document.getElementById("output").innerHTML =
+        "<table><tr><td>Date:</td><td><input type='text' name='selected_date' id='datepicker'/></td></tr>" +
+        "<tr><td>Size:</td><td><input type='text' id='size'/></td></tr>" +
+        "<tr><td colspan='2'><button onclick='getTimes()'>Show Available Times</button></td></tr></table>";
+    document.getElementById("status").innerHTML = "Enter date and party size to check availability";
+    setDatePicker("#datepicker");
+}
+        </script>
+
+    </head>
+    <body>
+    <h1>Restaurant Booking System</h1>
+    <table>
+            <tr><th><button onclick='switchGetBooking()'>Retrieve Booking</button></th>
+                <th><button onclick='switchCreateBooking()'>New Booking</button></th></tr>
+        </table>
+
+        <p id="status"></p>
+        <p id="output"></p>
+    </body>
+</html>
+
