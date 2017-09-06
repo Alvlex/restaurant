@@ -1,5 +1,28 @@
 <!DOCTYPE html>
 <html>
+    <style>
+        .table1{
+            cellspacing: 0px;
+            cellpadding: 0px;
+            border: 0px;
+            width: 325px;
+        }
+        .table2{
+            cellspacing: 0px;
+            cellpadding: 1px;
+            border: 1px;
+            width: 300px;
+        }
+        .row{
+            color: white;
+            background-color: grey;
+        }
+        .div{
+            width: 320px;
+            height: 60px;
+            overflow: auto;
+        }
+    </style>
     <head>
         <title>Restaurant Admin</title>
         <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
@@ -87,42 +110,6 @@ function logme(id) {
         <tr><td>blah</td></tr>
         <tr><td id='detail_time'>Time: 18:30</td></tr>
         <tr><td>Comment: blah</td></tr>
-    </table>
-    <table cellspacing="0" cellpadding="0" border="0" width="325">
-        <tr>
-            <td>
-                <table cellspacing="0" cellpadding="1" border="1" width="300" >
-                    <tr style="color:white;background-color:grey">
-                        <th>Time</th>
-                        <th>Detail</th>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <div style="width:320px; height:60px; overflow:auto;">
-                    <table cellspacing="0" cellpadding="1" border="1" width="300" >
-                        <tr>
-                            <td onclick="logme(1)">17:30</td>
-                            <td onclick="logme(1)">Paul</td>
-                        </tr>
-                        <tr>
-                            <td onclick="logme(12)">19:30</td>
-                            <td onclick="logme(12)">John</td>
-                        </tr>
-                        <tr>
-                            <td onclick="logme(20)">21:30</td>
-                            <td onclick="logme(20)">Gap</td>
-                        </tr>
-                        <tr>
-                            <td onclick="logme(31)">22:00</td>
-                            <td onclick="logme(31)">William</td>
-                        </tr>
-                    </table>
-                </div>
-            </td>
-        </tr>
     </table>
     </body>
 </html>
