@@ -8,7 +8,54 @@ var gapsize=10;
 
 var selected = 0;
 var room = 0; // 0 inside, 1 outside
-
+var xmlhttp = new XMLHttpRequest();
+xmlhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        var tr1 = document.createElement("TR");
+            document.getElementById("Table1").appendChild(tr1);
+            var td = document.createElement("TD");
+            tr1.appendChild(td);
+            var table = document.createElement("TABLE");
+            table.setAttribute("class", "table2");
+            td.appendChild(table);
+            tr1 = document.createElement("TR");
+            tr1.setAttribute("class", "row");
+            table.appendChild(tr1);
+            var th = document.createElement("TH");
+            tr1.appendChild(th);
+            var text = document.createTextNode("Time");
+            th.appendChild(text);
+            th = document.createElement("TH");
+            tr1.appendChild(th);
+            text = document.createTextNode("Detail");
+            th.appendChild(text);
+            tr1 = document.createElement("TR");
+            document.getElementById("Table1").appendChild(tr1);
+            td = document.createElement("TD");
+            tr1.appendChild(td);
+            var div = document.createElement("DIV");
+            div.setAttribute("class", "div");
+            td.appendChild(div);
+            table = document.createElement("TABLE");
+            table.setAttribute("class", "table2");
+            div.appendChild(table);
+            var tr = document.createElement("TR");
+            for (var i = 0; i < 1; i ++){
+                table.appendChild(tr);
+                td = document.createElement("TD");
+                td.setAttribute("onclick", "logme(1)");
+                tr.appendChild(td);
+                text = document.createTextNode("17:30");
+                td.appendChild(text);
+                td = document.createElement("TD");
+                td.setAttribute("onclick", "logme(2)");
+                tr.appendChild(td);
+                text = document.createTextNode("Paul");
+                td.appendChild(text);
+                tr = document.createElement("TR");
+            }
+    }
+};
 function initData() {
     // Construct table arrays
     insideTables[1] = {type:"r2", x:0, y:350};
@@ -111,7 +158,6 @@ function rect(ctx, item, seats, orientation) {
         for (var row=0; row < seats/2; ++row) {
             ctx.rect(x+(width-seatsize)/2, y-seatsize, seatsize, seatsize);
             ctx.rect(x+(width-seatsize)/2, y+height, seatsize, seatsize);
-
         }
     }
     else {
@@ -254,49 +300,8 @@ function render() {
         if (selected == item.count) {
             ctx.rect(item.x, item.y, item.width, item.height);
             ctx.stroke();
-            var tr1 = document.createElement("TR");
-            document.getElementById("Table1").appendChild(tr1);
-            var td = document.createElement("TD");
-            tr1.appendChild(td);
-            var table = document.createElement("TABLE");
-            table.setAttribute("class", "table2");
-            td.appendChild(table);
-            tr1 = document.createElement("TR");
-            tr1.setAttribute("class", "row");
-            table.appendChild(tr1);
-            var th = document.createElement("TH");
-            tr1.appendChild(th);
-            var text = document.createTextNode("Time");
-            th.appendChild(text);
-            th = document.createElement("TH");
-            tr1.appendChild(th);
-            text = document.createTextNode("Detail");
-            th.appendChild(text);
-            tr1 = document.createElement("TR");
-            document.getElementById("Table1").appendChild(tr1);
-            td = document.createElement("TD");
-            tr1.appendChild(td);
-            var div = document.createElement("DIV");
-            div.setAttribute("class", "div");
-            td.appendChild(div);
-            table = document.createElement("TABLE");
-            table.setAttribute("class", "table2");
-            div.appendChild(table);
-            var tr = document.createElement("TR");
-            for (var i = 0; i < 1; i ++){
-                table.appendChild(tr);
-                td = document.createElement("TD");
-                td.setAttribute("onclick", "logme(1)");
-                tr.appendChild(td);
-                text = document.createTextNode("17:30");
-                td.appendChild(text);
-                td = document.createElement("TD");
-                td.setAttribute("onclick", "logme(2)");
-                tr.appendChild(td);
-                text = document.createTextNode("Paul");
-                td.appendChild(text);
-                tr = document.createElement("TR");
-            }
+            xmlhttp.open("GET", "https://msjhgasjyb.execute-api.eu-west-2.amazonaws.com/beta?Table=" + (item.count - 1).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + "&Date=" + convertToISODate(document.getElementById("datepicker").value), true);
+            xmlhttp.send();
         }
     });
 }
