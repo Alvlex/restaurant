@@ -280,7 +280,7 @@ function render() {
             div.setAttribute("class", "div");
             td2.appendChild(div);
             var table2 = document.createElement("TABLE");
-            table2.setAttribute("class", "table2);
+            table2.setAttribute("class", "table2");
             div.appendChild(table2);
             var tr4 = document.createElement("TR");
             var td3;
