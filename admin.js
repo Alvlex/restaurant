@@ -254,7 +254,52 @@ function render() {
         if (selected == item.count) {
             ctx.rect(item.x, item.y, item.width, item.height);
             ctx.stroke();
-            
+            var tr1 = document.createElement("TR");
+            document.getElementById("Table1").appendChild(tr1);
+            var td = document.createElement("TD");
+            tr1.appendChild(td);
+            var table = document.createElement("TABLE");
+            table.setAttribute("class", "table2");
+            td.appendChild(table);
+            var tr2 = document.createElement("TR");
+            tr2.setAttribute("class", "row");
+            table.appendChild(tr2);
+            var th = document.createElement("TH");
+            tr2.appendChild(th);
+            var text = document.createTextNode("Time");
+            th.appendChild(text);
+            var th2 = document.createElement("TH");
+            tr2.appendChild(th2);
+            var text2 = document.createTextNode("Detail");
+            th2.appendChild(text2);
+            var tr3 = document.createElement("TR");
+            document.getElementById("Table1").appendChild(tr3);
+            var td2 = document.createElement("TD");
+            tr3.appendChild(td2);
+            var div = document.createElement("DIV");
+            div.setAttribute("class", "div");
+            td2.appendChild(div);
+            var table2 = document.createElement("TABLE");
+            table2.setAttribute("class", "table2);
+            div.appendChild(table2);
+            var tr4 = document.createElement("TR");
+            var td3;
+            var text3;
+            var text4;
+            for (var i = 0; i < 1; i ++){
+                table2.appendChild(tr4);
+                td3 = document.createElement("TD");
+                td3.setAttribute("onclick", "logme(1)");
+                tr4.appendChild(td3);
+                text3 = document.createTextNode("17:30");
+                td3.appendChild(text3);
+                td3 = document.createElement("TD");
+                td3.setAttribute("onclick", "logme(2)");
+                tr4.appendChild(td3);
+                text4 = document.createTextNode("Paul");
+                td3.appendChild(text4);
+                tr4 = document.createElement("TR");
+            }
         }
     });
 }
@@ -292,6 +337,7 @@ function addCanvasEvents() {
                 selected = item.count;
             }
         });
+        document.getElementById("Table1").innerHTML = "";
         render();
 //        console.log("Mousedown at " + mx + ", " + my+ ", selected = " + selected);
     }, true);
