@@ -55,16 +55,21 @@ function getAll() {
 
     xhttp.send();
 }
+function setToday() {
+    document.getElementById("datepicker").value = $.datepicker.formatDate( "dd MM yy", new Date());
+}
+
 function setDatePicker(id) {
     $( id ).datepicker();
     $( id ).datepicker( "option", "dateFormat", "dd MM yy" );
     $( id ).datepicker( "option", "minDate", 0);
 //    $( id ).datepicker( "option", "maxDate", new Date(2017, 7, 20) );
+    setToday();
 }
 function init() {
 
     initData();
-    addKey(0,480);
+    addKey(0,481);
     setDatePicker("#datepicker");
     addCanvasEvents();
     inside();
@@ -80,10 +85,11 @@ function logme(id) {
     <body onload="init()">
     <h1>Restaurant Admin Interface</h1>
     <table><tr><td>Date:</td><td><input type='text' name='selected_date' id='datepicker'/></td>
+        <td><button onclick='setToday()'>Today</button></td>
         <td><button onclick='getAll()'>Show All Bookings</button></td>
         <td><button onclick='inside()'>View Inside</button></td>
         <td><button onclick='outside()'>View Outside</button></td></tr>
-        <tr><td colspan='4' rowspan='4'><canvas width='500' height='525' id='floorplan'  style='border:1px solid #d3d3d3;'>You must use a supported browser, such as Chrome</canvas></td>
+        <tr><td colspan='5' rowspan='4'><canvas width='500' height='525' id='floorplan'  style='border:1px solid #d3d3d3;'>You must use a supported browser, such as Chrome</canvas></td>
             <td id='detail_table_id'>Table Number: 4</td></tr>
         <tr><td>blah</td></tr>
         <tr><td id='detail_time'>Time: 18:30</td></tr>
