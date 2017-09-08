@@ -9,7 +9,6 @@ var gapsize=10;
 var selected = 0;
 var room = 0; // 0 inside, 1 outside
 
-
 var day_bookings = [];
 
 function setColour(tables) {
@@ -40,6 +39,55 @@ function applyBookings() {
     setColour(insideTables);
     setColour(outsideTables);
 }
+
+var xmlhttp = new XMLHttpRequest();
+xmlhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        var tr1 = document.createElement("TR");
+            document.getElementById("Table1").appendChild(tr1);
+            var td = document.createElement("TD");
+            tr1.appendChild(td);
+            var table = document.createElement("TABLE");
+            table.setAttribute("class", "table2");
+            td.appendChild(table);
+            tr1 = document.createElement("TR");
+            tr1.setAttribute("class", "row");
+            table.appendChild(tr1);
+            var th = document.createElement("TH");
+            tr1.appendChild(th);
+            var text = document.createTextNode("Time");
+            th.appendChild(text);
+            th = document.createElement("TH");
+            tr1.appendChild(th);
+            text = document.createTextNode("Detail");
+            th.appendChild(text);
+            tr1 = document.createElement("TR");
+            document.getElementById("Table1").appendChild(tr1);
+            td = document.createElement("TD");
+            tr1.appendChild(td);
+            var div = document.createElement("DIV");
+            div.setAttribute("class", "div");
+            td.appendChild(div);
+            table = document.createElement("TABLE");
+            table.setAttribute("class", "table2");
+            div.appendChild(table);
+            var tr = document.createElement("TR");
+            for (var i = 0; i < 1; i ++){
+                table.appendChild(tr);
+                td = document.createElement("TD");
+                td.setAttribute("onclick", "logme(1)");
+                tr.appendChild(td);
+                text = document.createTextNode("17:30");
+                td.appendChild(text);
+                td = document.createElement("TD");
+                td.setAttribute("onclick", "logme(2)");
+                tr.appendChild(td);
+                text = document.createTextNode("Paul");
+                td.appendChild(text);
+                tr = document.createElement("TR");
+            }
+    }
+};
 
 function initData() {
     // Construct table arrays
@@ -79,7 +127,6 @@ function initData() {
     outsideTables[9] = {type:"r4", x:200, y:0};
     outsideTables[10] = {type:"r4", x:200, y:70};
     outsideTables[11] = {type:"r4", x:200, y:140};
-
     outsideTables[12] = {type:"r4", x:200, y:210};
     outsideTables[13] = {type:"r4", x:200, y:280};
     outsideTables[14] = {type:"c4", x:200, y:350};
@@ -158,7 +205,6 @@ function rect(ctx, item, seats, orientation) {
         for (var row=0; row < seats/2; ++row) {
             ctx.rect(x+(width-seatsize)/2, y-seatsize, seatsize, seatsize);
             ctx.rect(x+(width-seatsize)/2, y+height, seatsize, seatsize);
-
         }
     }
     else {
@@ -316,6 +362,8 @@ function render() {
         if (selected === item.count) {
             ctx.rect(item.x, item.y, item.width, item.height);
             ctx.stroke();
+            xmlhttp.open("GET", "https://msjhgasjyb.execute-api.eu-west-2.amazonaws.com/beta?Table=" + (item.count - 1).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + "&Date=" + convertToISODate(document.getElementById("datepicker").value), true);
+            xmlhttp.send();
         }
     });
 }
@@ -353,6 +401,7 @@ function addCanvasEvents() {
                 selected = item.count;
             }
         });
+        document.getElementById("Table1").innerHTML = "";
         render();
 //        console.log("Mousedown at " + mx + ", " + my+ ", selected = " + selected);
     }, true);
