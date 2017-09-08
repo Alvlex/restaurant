@@ -9,6 +9,38 @@ var gapsize=10;
 var selected = 0;
 var room = 0; // 0 inside, 1 outside
 
+
+var day_bookings = [];
+
+function setColour(tables) {
+    tables.forEach(function (table) {
+        table.colour = "#bebebe";
+        if (table.id in day_bookings)
+        {
+            day_bookings[table.id].forEach(function(booking) {
+                if (booking.comment !== "") {
+                    table.colour = "#ff95bf";
+                }
+                else if (table.colour === "#bebebe") {
+                    table.colour = "#24c12e";
+                }
+            });
+        }
+    });
+
+}
+function applyBookings() {
+    day_bookings = [];
+    day_bookings[3] = [{comment:"Book table 1"},{comment:"Book table 1"},{comment:""}];
+    day_bookings[4] = [{comment:""},{comment:"Book table 1"},{comment:""}];
+    day_bookings[52] = [{comment:""},{comment:""},{comment:""}];
+    day_bookings[6] = [{comment:"Book table 1"}];
+    day_bookings[7] = [{comment:""}];
+
+    setColour(insideTables);
+    setColour(outsideTables);
+}
+
 function initData() {
     // Construct table arrays
     insideTables[1] = {type:"r2", x:0, y:350};
@@ -17,7 +49,7 @@ function initData() {
     insideTables[4] = {type:"r2", x:120, y:350};
     insideTables[5] = {type:"r4", x:120, y:280};
     insideTables[6] = {type:"r6", x:0, y:140};
-    insideTables[7] = {type:"c4", x:120, y:200};
+    insideTables[7] = {type:"c8", x:120, y:200};
     insideTables[8] = {type:"r2", x:120, y:140};
     insideTables[9] = {type:"r4", x:160, y:70};
     insideTables[10] = {type:"c4", x:0, y:70};
@@ -34,23 +66,23 @@ function initData() {
     insideTables[21] = {type:"r4", x:180, y:410};
     insideTables[22] = {type:"r4", x:240, y:410};
     insideTables[23] = {type:"r4", x:330, y:410};
-    insideTables[24] = {type:"r4", x:300, y:350};
+    insideTables[24] = {type:"r4", x:300, y:335};
 
-    outsideTables[1] = {type:"r4",x:0,y:300};
-    outsideTables[2] = {type:"r4", x:0, y:240};
-    outsideTables[3] = {type:"r4", x:60, y:240};
-    outsideTables[4] = {type:"r4", x:60, y:300};
-    outsideTables[5] = {type:"c4", x:0, y:120};
+    outsideTables[1] = {type:"r4",x:0,y:350};
+    outsideTables[2] = {type:"r4", x:0, y:280};
+    outsideTables[3] = {type:"r4", x:100, y:280};
+    outsideTables[4] = {type:"r4", x:100, y:350};
+    outsideTables[5] = {type:"c4", x:0, y:140};
     outsideTables[6] = {type:"c4", x:0, y:0};
-    outsideTables[7] = {type:"c4", x:60, y:0};
-    outsideTables[8] = {type:"c4", x:60, y:120};
-    outsideTables[9] = {type:"r4", x:120, y:0};
-    outsideTables[10] = {type:"r4", x:120, y:60};
-    outsideTables[11] = {type:"r4", x:120, y:120};
+    outsideTables[7] = {type:"c4", x:100, y:0};
+    outsideTables[8] = {type:"c4", x:100, y:140};
+    outsideTables[9] = {type:"r4", x:200, y:0};
+    outsideTables[10] = {type:"r4", x:200, y:70};
+    outsideTables[11] = {type:"r4", x:200, y:140};
 
-    outsideTables[12] = {type:"r4", x:120, y:180};
-    outsideTables[13] = {type:"r4", x:120, y:240};
-    outsideTables[14] = {type:"c4", x:120, y:300};
+    outsideTables[12] = {type:"r4", x:200, y:210};
+    outsideTables[13] = {type:"r4", x:200, y:280};
+    outsideTables[14] = {type:"c4", x:200, y:350};
 
     var tableid=1;
     var j;
@@ -58,8 +90,7 @@ function initData() {
         insideTables[j].width = 60;
         insideTables[j].height = 60;
         insideTables[j].count = j;
-        insideTables[j].id = String(tableid);
-        insideTables[j].comment = "";
+        insideTables[j].id = tableid;
         if (insideTables[j].type === "r4") insideTables[j].height = 70;
         else if (insideTables[j].type === "r6") insideTables[j].height = 80;
         else if (insideTables[j].type === "R4") insideTables[j].width = 70;
@@ -73,19 +104,20 @@ function initData() {
         if (tableid === 25) tableid=30;
         else if (tableid === 34) tableid=40;
         else if (tableid === 44) tableid=50;
-        outsideTables[j].id = String(tableid);
-        outsideTables[j].comment = "";
+        outsideTables[j].id = tableid;
         if (outsideTables[j].type === "r4") outsideTables[j].height = 70;
         else if (outsideTables[j].type === "r6") outsideTables[j].height = 80;
         else if (outsideTables[j].type === "R4") outsideTables[j].width = 70;
         else if (outsideTables[j].type === "R6") outsideTables[j].width = 80;
     }
+
+    applyBookings();
 }
+
 function addKey(x, y) {
     var ctx = document.getElementById('floorplan').getContext('2d');
     ctx.beginPath();
 
-    ctx.font = "14px Arial";
     ctx.fillStyle="#ff95bf";
     ctx.fillRect(x,y,10,10);
     ctx.fillStyle="#000000";
@@ -100,11 +132,9 @@ function addKey(x, y) {
     ctx.fillRect(x,y,10,10);
     ctx.fillStyle="#000000";
     ctx.fillText("No bookings yet", x+15, y+10);
-    ctx.fillStyle="#000000";
 }
 function label(ctx, item) {
-    ctx.font = "14px Arial";
-    var offset=(item.width)/2-4*item.id.length;
+    var offset=(item.width-ctx.measureText(item.id).width)/2;
     ctx.fillText(item.id, item.x+offset, item.y+item.height/2 + 5);
 }
 function drawVSeats(ctx, x, y) {
@@ -173,6 +203,10 @@ function drawV(ctx, item, seats) {
     var y = item.y + gapsize;
     var height = item.height-20;
     ctx.rect(x, y, tablesize, height);
+    ctx.fillStyle = item.colour;
+    ctx.fillRect(x, y, tablesize, height);
+    ctx.fillStyle = "#000000";
+    ctx.rect(x, y, tablesize, height);
     y += (height-seatsize)/2;
     switch(seats) {
         case 2:
@@ -195,7 +229,10 @@ function drawH(ctx, item, seats) {
     var x = item.x + gapsize;
     var y = item.y + gapsize;
     var width = item.width-20;
-    ctx.rect(x, y, width, tablesize);
+    ctx.fillStyle = item.colour;
+    ctx.fillRect(x, y, tablesize, height);
+    ctx.fillStyle = "#000000";
+    ctx.rect(x, y, tablesize, height);
     x += (width-seatsize)/2;
     switch(seats) {
         case 2:
@@ -232,6 +269,10 @@ function circle(ctx, item, seats) {
     var ycentre = y+radius;
     ctx.beginPath();
     ctx.arc(xcentre,ycentre,radius,0,2*Math.PI);
+    ctx.fillStyle = item.colour;
+    ctx.fill();
+    ctx.fillStyle = "#000000";
+
     drawVSeats(ctx, x, y+radius-seatsize/2);
     drawHSeats(ctx, x+radius-seatsize/2, y);
     ctx.stroke();
@@ -256,7 +297,9 @@ function circle(ctx, item, seats) {
 function render() {
     var ctx = document.getElementById('floorplan').getContext('2d');
     ctx.beginPath();
-    ctx.clearRect(0,0,500,480);
+    ctx.clearRect(0,0,500,481);
+    ctx.font = "14px Arial";
+
     var tables = (room===0)?insideTables:outsideTables;
     tables.forEach(function (item) {
         if (item.type === "r2") drawV(ctx, item, 2);
@@ -273,7 +316,6 @@ function render() {
         if (selected === item.count) {
             ctx.rect(item.x, item.y, item.width, item.height);
             ctx.stroke();
-
         }
     });
 }
