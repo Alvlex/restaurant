@@ -15,6 +15,10 @@ var colour_comment = "#ff95bf";
 var colour_booking = "#24c12e";
 var colour_empty = "#bebebe";
 
+var times = [];
+
+
+
 function setColour(tables) {
     tables.forEach(function (table) {
         table.colour = colour_empty;
@@ -38,24 +42,32 @@ function applyBookings() {
     console.log("Loading bookings for " + date);
 
     day_bookings = [
-        {table:3,time:"17:30",comment:"Book table 1",size:2,name:"Paul Vanlint", email:"paul@polyzing.com"},
-        {table:3,time:"19:30",comment:"Book table 1",size:2,name:"Alex Vanlint", email:"paul@polyzing.com"},
-        {table:3,time:"22:00",comment:"",size:2,name:"William Vanlint", email:"paul@polyzing.com"},
-        {table:4,time:"18:30",comment:"",size:2,name:"Lizzy Vanlint", email:"paul@polyzing.com"},
-        {table:4,time:"20:30",comment:"Book table 1",size:2,name:"Tamara Vanlint", email:"paul@polyzing.com"},
-        {table:52,time:"18:00",comment:"",size:2,name:"John Smith", email:"paul@polyzing.com"},
-        {table:52,time:"20:00",comment:"",size:2,name:"Paul Smith", email:"paul@polyzing.com"},
-        {table:52,time:"22:00",comment:"",size:2,name:"George Smith", email:"paul@polyzing.com"},
-        {table:6,time:"18:30",comment:"Really big comment, can we have it wrap? Perhaps it might be too big, when specified as a single sentence.",size:2,name:"Ringo Smith", email:"paul@polyzing.com"},
-        {table:7,time:"20:30",comment:"",size:2,name:"Brian Epstein", email:"paul@polyzing.com"},
-    ]
+        {table:3,time:22,comment:"Book table 1",size:2,name:"Paul Vanlint", email:"paul@polyzing.com"},
+        {table:3,time:30,comment:"Book table 1",size:2,name:"Alex Vanlint", email:"paul@polyzing.com"},
+        {table:3,time:40,comment:"",size:2,name:"William Vanlint", email:"paul@polyzing.com"},
+        {table:4,time:26,comment:"",size:2,name:"Lizzy Vanlint", email:"paul@polyzing.com"},
+        {table:4,time:34,comment:"Book table 1",size:2,name:"Tamara Vanlint", email:"paul@polyzing.com"},
+        {table:52,time:24,comment:"",size:2,name:"John Smith", email:"paul@polyzing.com"},
+        {table:52,time:32,comment:"",size:2,name:"Paul Smith", email:"paul@polyzing.com"},
+        {table:52,time:40,comment:"",size:2,name:"George Smith", email:"paul@polyzing.com"},
+        {table:6,time:26,comment:"Really big comment, can we have it wrap? Perhaps it might be too big, when specified as a single sentence.",size:2,name:"Ringo Smith", email:"paul@polyzing.com"},
+        {table:7,time:34,comment:"",size:2,name:"Brian Epstein", email:"paul@polyzing.com"}
+    ];
 
     table_bookings = [];
     day_bookings.forEach(function(item) {
+        console.log("Adding entry for table " + item.table + " at " + times[item.time]);
         if (!(item.table in table_bookings)) {
             table_bookings[item.table] = [];
         }
-        table_bookings[item.table].push(item);
+
+        table_bookings[item.table][item.time] = item;
+    });
+
+    table_bookings.forEach(function(item) {
+        item.forEach(function (entry) {
+            console.log( entry.id + ", " + entry.time);
+        });
     });
 //    day_bookings[3] = [{comment:"Book table 1"},{comment:"Book table 1"},{comment:""}];
 //    day_bookings[4] = [{comment:""},{comment:"Book table 1"},{comment:""}];
@@ -68,26 +80,47 @@ function applyBookings() {
 }
 
 function showDetail(time) {
+    if (selected in table_bookings) {
+        if (time in table_bookings[selected]) {
+            var item = table_bookings[selected][time];
+            console.log("Showing entry for " + time);
+            console.log(item);
+        }
+    }
 
 }
 
 function renderTableBookings(bookings) {
+    console.log("renderTableBookings for " + bookings.length);
     var text = "";
     var colour;
+    var timestr = "";
+    var next_timeslot = 24;
+    var last_timeslot = 42;
     bookings.forEach(function(item) {
-        if (item.size === 0) {
-            text += "<tr style='background-color: " + colour_empty + ";'><td>" + item.time + "</td><td>Empty</td></tr>";
+        while (next_timeslot < item.time) {
+            text += "<tr style='background-color: " + colour_empty + ";'><td>" + times[next_timeslot++] + "</td><td>Empty</td></tr>";
         }
-        else if (item.comment === "") {
+        if (item.time in times) {
+            timestr = times[item.time];
+        }
+        else {
+            timestr = "?";
+        }
+        if (item.comment === "") {
             text += "<tr onmousedown='showDetail(" + item.time + ")' style='background-color: " + colour_booking + ";'><td>" +
-                item.time + "</td><td>" + item.size + "</td></tr>";
+                timestr + "</td><td>" + item.name + "</td></tr>";
         }
         else {
             text += "<tr class='tooltip' onmousedown='showDetail(" + item.time + ")' style='background-color: " + colour_comment + ";'><td>" +
-                item.time + "<span class='tooltiptext'>" + item.comment + "</span></td><td>" + item.size + "</td></tr>";
+                timestr + "<span class='tooltiptext'>" + item.comment + "</span></td><td>" + item.name + "</td></tr>";
         }
+        next_timeslot+=6;
     });
-    document.getElementById("table_bookings").innerHTML = "<table class='details'><tr><th>Time</th><th>Size</th></tr><tr id='container'></tr>" + text + "</table>";
+    while (next_timeslot < last_timeslot) {
+        text += "<tr style='background-color: " + colour_empty + ";'><td>" + times[next_timeslot++] + "</td><td>Empty</td></tr>";
+    }
+    document.getElementById("table_bookings").innerHTML = "<table class='details'><tr><th>Time</th><th>Name</th></tr><tr id='container'></tr>" + text + "</table>";
 
 }
 
@@ -141,6 +174,21 @@ xmlhttp.onreadystatechange = function() {
 };
 
 function initData() {
+    var i;
+    var idx=0;
+    for (i=12; i<22;i++) {
+        times[idx++] = i + ":00";
+        times[idx++] = i + ":15";
+        times[idx++] = i + ":30";
+        times[idx++] = i + ":45";
+    }
+    times[idx++] = i + ":00";
+    times[idx++] = i + ":15";
+    times[idx++] = i + ":30";
+
+    times.forEach(function(item) {
+        console.log("Time: " + item);
+    })
     // Construct table arrays
     insideTables[1] = {type:"r2", x:0, y:350};
     insideTables[2] = {type:"r4", x:0, y:280};
@@ -408,16 +456,19 @@ function render() {
         else if (item.type === "c6") circle(ctx, item, 6);
         else if (item.type === "c7") circle(ctx, item, 7);
         else if (item.type === "c8") circle(ctx, item, 8);
-        if (selected === item.count) {
+        if (selected === item.id) {
             ctx.rect(item.x, item.y, item.width, item.height);
             ctx.stroke();
-            if (item.count in table_bookings) renderTableBookings(table_bookings[item.count]);
+            if (selected in table_bookings) renderTableBookings(table_bookings[selected]);
             else renderTableBookings([]);
-            //[
-//                {time:"18:00", size:0, comment:""},
-//                {time:"18:30", size:2, comment:""},
-//                {time:"20:00", size:2, comment:"Really big comment, can we have it wrap? Perhaps it might be too big, when specified as a single sentence ..................................."},
-//                {time:"22:00", size:2, comment:"Table 5 please"}]);
+            /*
+            renderTableBookings(
+                [
+                    {time:"18:00", size:0, comment:""},
+                    {time:"18:30", size:2, comment:""},
+                    {time:"20:00", size:2, comment:"Really big comment, can we have it wrap? Perhaps it might be too big, when specified as a single sentence ..................................."},
+                    {time:"22:00", size:2, comment:"Table 5 please"}]);
+                    */
 //            xmlhttp.open("GET", url+"?Table=" + (item.count - 1).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + "&Date=" + convertToISODate(document.getElementById("datepicker").value), true);
             xmlhttp.open("GET", "https://msjhgasjyb.execute-api.eu-west-2.amazonaws.com/beta?Table=" + (item.count - 1).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + "&Date=" + convertToISODate(document.getElementById("datepicker").value), true);
             xmlhttp.send();
@@ -454,7 +505,7 @@ function addCanvasEvents() {
 
         tables.forEach(function (item) {
             if ((mx > item.x) && (my > item.y) && (mx < item.x + item.width) && (my < item.y + item.height)) {
-                selected = item.count;
+                selected = item.id;
             }
         });
         document.getElementById("Table1").innerHTML = "";
