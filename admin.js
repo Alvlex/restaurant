@@ -15,9 +15,11 @@ var colour_comment = "#ff95bf";
 var colour_booking = "#24c12e";
 var colour_empty = "#bebebe";
 
+var excluded_days = [];
+
+var hours = [];
+
 var times = [];
-
-
 
 function setColour(tables) {
     tables.forEach(function (table) {
@@ -37,9 +39,27 @@ function setColour(tables) {
 
 }
 function applyBookings() {
-    var date = document.getElementById("datepicker").value;
+    var date = new Date(document.getElementById("datepicker").value);
 
-    console.log("Loading bookings for " + date);
+    hours = [0];
+
+    if (date.getDay() === 0) {
+        // Sunday
+        hours.push(38);
+    }
+    else if (date.getDay() === 6) {
+        // Saturday
+        hours.push(42);
+    }
+    else {
+        // Weekday
+        hours.push(10);
+        hours.push(24);
+        hours.push(42);
+    }
+
+
+    console.log("Loading bookings for " + date + " - day " + date.getDay());
 
     day_bookings = [
         {table:3,time:22,comment:"Book table 1",size:2,name:"Paul Vanlint", email:"paul@polyzing.com"},
@@ -69,11 +89,6 @@ function applyBookings() {
             console.log( entry.id + ", " + entry.time);
         });
     });
-//    day_bookings[3] = [{comment:"Book table 1"},{comment:"Book table 1"},{comment:""}];
-//    day_bookings[4] = [{comment:""},{comment:"Book table 1"},{comment:""}];
-//    day_bookings[52] = [{comment:""},{comment:""},{comment:""}];
-//    day_bookings[6] = [{comment:"Book table 1"}];
-//    day_bookings[7] = [{comment:""}];
 
     setColour(insideTables);
     setColour(outsideTables);
@@ -95,9 +110,17 @@ function renderTableBookings(bookings) {
     var text = "";
     var colour;
     var timestr = "";
-    var next_timeslot = 24;
-    var last_timeslot = 42;
+    var next_timeslot = hours[0];
+    var last_timeslot = hours[1];
     bookings.forEach(function(item) {
+        if (item.time >last_timeslot) {
+            while (next_timeslot <= last_timeslot) {
+                text += "<tr style='background-color: " + colour_empty + ";'><td>" + times[next_timeslot++] + "</td><td>Empty</td></tr>";
+            }
+            text += "<tr style='background-color: white; height: 10px;'><td></td><td></td></tr>";
+            next_timeslot = hours[2];
+            last_timeslot = hours[3];
+        }
         while (next_timeslot < item.time) {
             text += "<tr style='background-color: " + colour_empty + ";'><td>" + times[next_timeslot++] + "</td><td>Empty</td></tr>";
         }
@@ -117,8 +140,18 @@ function renderTableBookings(bookings) {
         }
         next_timeslot+=6;
     });
-    while (next_timeslot < last_timeslot) {
+    while (next_timeslot <= last_timeslot) {
         text += "<tr style='background-color: " + colour_empty + ";'><td>" + times[next_timeslot++] + "</td><td>Empty</td></tr>";
+    }
+    if ((hours.length === 4) && (last_timeslot !== hours[3])) {
+        text += "<tr style='background-color: white; height: 10px;'><td></td><td></td></tr>";
+
+        next_timeslot = hours[2];
+        last_timeslot = hours[3];
+
+        while (next_timeslot <= last_timeslot) {
+            text += "<tr style='background-color: " + colour_empty + ";'><td>" + times[next_timeslot++] + "</td><td>Empty</td></tr>";
+        }
     }
     document.getElementById("table_bookings").innerHTML = "<table class='details'><tr><th>Time</th><th>Name</th></tr><tr id='container'></tr>" + text + "</table>";
 
@@ -188,7 +221,18 @@ function initData() {
 
     times.forEach(function(item) {
         console.log("Time: " + item);
-    })
+    });
+
+    excluded_days.push((new Date(2017,8,23)).getTime());
+    excluded_days.push((new Date(2017,11,25)).getTime());
+
+//    date = new Date(2017,9,20);
+//    excluded_days.push(date.getTime());
+//    date = new Date(2017,10,25);
+//    excluded_days.push(date.getTime());
+//    date = new Date(2017,11,25);
+//    excluded_days.push(date.getTime());
+
     // Construct table arrays
     insideTables[1] = {type:"r2", x:0, y:350};
     insideTables[2] = {type:"r4", x:0, y:280};

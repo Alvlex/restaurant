@@ -136,10 +136,12 @@ function getAll() {
 }
 function changeDate() {
     applyBookings();
+    inside();
 }
 function setToday() {
     document.getElementById("datepicker").value = $.datepicker.formatDate( "dd MM yy", new Date());
     applyBookings();
+    inside();
 }
 
 function setDatePicker(id) {
@@ -147,16 +149,23 @@ function setDatePicker(id) {
     $( id ).datepicker( "option", "dateFormat", "dd MM yy" );
     $( id ).datepicker( "option", "minDate", 0);
 //    $( id ).datepicker( "option", "maxDate", new Date(2017, 7, 20) );
+    $( id ).datepicker( "option", "beforeShowDay", function(date) {
+        var time = date.getTime();
+        for (var i = 0; i < excluded_days.length; i++) {
+            if (excluded_days[i] === time) {
+                return [false,''];
+            }
+        }
+        return [true,''];
+    });
+
 }
 function init() {
     initData();
     addKey(0,481);
     setDatePicker("#datepicker");
-    setToday();
-
     addCanvasEvents();
-    inside();
-
+    setToday();
 }
 
 function logme(id) {
@@ -172,8 +181,8 @@ function logme(id) {
         <td><button onclick='getAll()'>Show All Bookings</button></td>
         <td><button onclick='inside()'>View Inside</button></td>
         <td><button onclick='outside()'>View Outside</button></td></tr>
-        <tr><td colspan='5'><canvas width='500' height='525' id='floorplan'  style='border:1px solid #d3d3d3;'>You must use a supported browser, such as Chrome</canvas></td>
-            <td id='table_bookings' colspan='2' style='vertical-align:top'>Table Number: 4</td></tr>
+        <tr><td colspan='5' style='vertical-align:top'><canvas width='500' height='525' id='floorplan'  style='border:1px solid #d3d3d3;'>You must use a supported browser, such as Chrome</canvas></td>
+            <td id='table_bookings' colspan='2' style='vertical-align:top'></td></tr>
     </table>
     <table id="Table1", class="table1">
     </table>
