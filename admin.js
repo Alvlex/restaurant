@@ -63,15 +63,17 @@ function applyBookings() {
 
     day_bookings = [
         {table:3,time:22,comment:"Book table 1",size:2,name:"Paul Vanlint", email:"paul@polyzing.com"},
-        {table:3,time:30,comment:"Book table 1",size:2,name:"Alex Vanlint", email:"paul@polyzing.com"},
-        {table:3,time:40,comment:"",size:2,name:"William Vanlint", email:"paul@polyzing.com"},
-        {table:4,time:26,comment:"",size:2,name:"Lizzy Vanlint", email:"paul@polyzing.com"},
-        {table:4,time:34,comment:"Book table 1",size:2,name:"Tamara Vanlint", email:"paul@polyzing.com"},
         {table:52,time:24,comment:"",size:2,name:"John Smith", email:"paul@polyzing.com"},
-        {table:52,time:32,comment:"",size:2,name:"Paul Smith", email:"paul@polyzing.com"},
-        {table:52,time:40,comment:"",size:2,name:"George Smith", email:"paul@polyzing.com"},
+        {table:4,time:26,comment:"",size:2,name:"Lizzy Vanlint", email:"paul@polyzing.com"},
         {table:6,time:26,comment:"Really big comment, can we have it wrap? Perhaps it might be too big, when specified as a single sentence.",size:2,name:"Ringo Smith", email:"paul@polyzing.com"},
-        {table:7,time:34,comment:"",size:2,name:"Brian Epstein", email:"paul@polyzing.com"}
+        {table:15,time:26,comment:"Multi-tables 15 & 18",size:8,name:"Sparky Vanlint", email:"paul@polyzing.com"},
+        {table:18,time:26,comment:"Multi-tables 15 & 18",size:8,name:"Sparky Vanlint", email:"paul@polyzing.com"},
+        {table:3,time:30,comment:"Book table 1",size:2,name:"Alex Vanlint", email:"paul@polyzing.com"},
+        {table:52,time:32,comment:"",size:2,name:"Paul Smith", email:"paul@polyzing.com"},
+        {table:7,time:34,comment:"",size:2,name:"Brian Epstein", email:"paul@polyzing.com"},
+        {table:4,time:34,comment:"Book table 1",size:2,name:"Tamara Vanlint", email:"paul@polyzing.com"},
+        {table:3,time:40,comment:"",size:2,name:"William Vanlint", email:"paul@polyzing.com"},
+        {table:52,time:40,comment:"",size:2,name:"George Smith", email:"paul@polyzing.com"}
     ];
 
     table_bookings = [];
@@ -112,46 +114,91 @@ function renderTableBookings(bookings) {
     var timestr = "";
     var next_timeslot = hours[0];
     var last_timeslot = hours[1];
+    var current_timeslot = 0;
+    var date = new Date(document.getElementById("datepicker").value);
+    var now = new Date();
+    var nowtime;
+    if (now.getHours() < 2) {
+        // Up to 2am, now counts as end of previous day
+        current_timeslot=36;
+        nowtime = now.setHours(0,0,0,0);
+        nowtime -= 86400000;
+    }
+    else {
+        current_timeslot=(now.getHours() - 12) * 4 + Math.floor(now.getMinutes()/15) - 1;
+        if (current_timeslot > 36) {
+            current_timeslot = 36;
+        }
+        nowtime = now.setHours(0,0,0,0);
+    }
+    if (date.getTime() === nowtime) {
+        if (current_timeslot > next_timeslot) {
+            next_timeslot = current_timeslot;
+        }
+    }
+    else {
+        current_timeslot = 0;
+    }
+
     bookings.forEach(function(item) {
-        if (item.time >last_timeslot) {
-            while (next_timeslot <= last_timeslot) {
+        if (item.time + 6 > current_timeslot) {
+            if (item.time > last_timeslot) {
+                if (current_timeslot <= last_timeslot) {
+                    while (next_timeslot <= last_timeslot) {
+                        text += "<tr style='background-color: " + colour_empty + ";'><td>" + times[next_timeslot++] + "</td><td>Empty</td></tr>";
+                    }
+                    text += "<tr style='background-color: white; height: 10px;'><td></td><td></td></tr>";
+                    next_timeslot = hours[2];
+                    last_timeslot = hours[3];
+                }
+                else {
+                    next_timeslot = hours[2];
+                    last_timeslot = hours[3];
+                    if (current_timeslot > next_timeslot) {
+                        next_timeslot = current_timeslot;
+                    }
+                }
+            }
+            while (next_timeslot < item.time) {
                 text += "<tr style='background-color: " + colour_empty + ";'><td>" + times[next_timeslot++] + "</td><td>Empty</td></tr>";
             }
+            if (item.time in times) {
+                timestr = times[item.time];
+            }
+            else {
+                timestr = "?";
+            }
+            if (item.comment === "") {
+                text += "<tr onmousedown='showDetail(" + item.time + ")' style='background-color: " + colour_booking + ";'><td>" +
+                    timestr + "</td><td>" + item.name + "</td></tr>";
+            }
+            else {
+                text += "<tr class='tooltip' onmousedown='showDetail(" + item.time + ")' style='background-color: " + colour_comment + ";'><td>" +
+                    timestr + "<span class='tooltiptext'>" + item.comment + "</span></td><td>" + item.name + "</td></tr>";
+            }
+            next_timeslot+=6;
+
+        }
+    });
+    if (current_timeslot <= last_timeslot) {
+        while (next_timeslot <= last_timeslot) {
+            text += "<tr style='background-color: " + colour_empty + ";'><td>" + times[next_timeslot++] + "</td><td>Empty</td></tr>";
+        }
+        if ((hours.length === 4) && (last_timeslot !== hours[3])) {
             text += "<tr style='background-color: white; height: 10px;'><td></td><td></td></tr>";
             next_timeslot = hours[2];
             last_timeslot = hours[3];
         }
-        while (next_timeslot < item.time) {
-            text += "<tr style='background-color: " + colour_empty + ";'><td>" + times[next_timeslot++] + "</td><td>Empty</td></tr>";
-        }
-        if (item.time in times) {
-            timestr = times[item.time];
-        }
-        else {
-            timestr = "?";
-        }
-        if (item.comment === "") {
-            text += "<tr onmousedown='showDetail(" + item.time + ")' style='background-color: " + colour_booking + ";'><td>" +
-                timestr + "</td><td>" + item.name + "</td></tr>";
-        }
-        else {
-            text += "<tr class='tooltip' onmousedown='showDetail(" + item.time + ")' style='background-color: " + colour_comment + ";'><td>" +
-                timestr + "<span class='tooltiptext'>" + item.comment + "</span></td><td>" + item.name + "</td></tr>";
-        }
-        next_timeslot+=6;
-    });
-    while (next_timeslot <= last_timeslot) {
-        text += "<tr style='background-color: " + colour_empty + ";'><td>" + times[next_timeslot++] + "</td><td>Empty</td></tr>";
     }
-    if ((hours.length === 4) && (last_timeslot !== hours[3])) {
-        text += "<tr style='background-color: white; height: 10px;'><td></td><td></td></tr>";
-
+    else if ((hours.length === 4) && (last_timeslot !== hours[3])) {
         next_timeslot = hours[2];
         last_timeslot = hours[3];
-
-        while (next_timeslot <= last_timeslot) {
-            text += "<tr style='background-color: " + colour_empty + ";'><td>" + times[next_timeslot++] + "</td><td>Empty</td></tr>";
+        if (current_timeslot > next_timeslot) {
+            next_timeslot = current_timeslot;
         }
+    }
+    while (next_timeslot <= last_timeslot) {
+        text += "<tr style='background-color: " + colour_empty + ";'><td>" + times[next_timeslot++] + "</td><td>Empty</td></tr>";
     }
     document.getElementById("table_bookings").innerHTML = "<table class='details'><tr><th>Time</th><th>Name</th></tr><tr id='container'></tr>" + text + "</table>";
 
