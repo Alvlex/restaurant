@@ -1,3 +1,4 @@
+var url= "https://msjhgasjyb.execute-api.eu-west-2.amazonaws.com/beta/demo/website";
 function cancelBooking(id, email) {
     document.getElementById("output").innerHTML = "";
     //alert("Cancelling " + id + " for " + email);
@@ -14,7 +15,7 @@ function cancelBooking(id, email) {
             }
         }
     };
-    xhttp.open("DELETE", "https://msjhgasjyb.execute-api.eu-west-2.amazonaws.com/beta/demo/website?ID=" + id + "&Email=" + encodeURIComponent(email), true);
+    xhttp.open("DELETE", url+"?ID=" + id + "&Email=" + encodeURIComponent(email), true);
 
     xhttp.send();
 
@@ -40,7 +41,9 @@ function book(time, size) {
     if (email == 'Restaurant') {
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
+            console.log("Status: " + this.status);
             if (this.readyState == 4 && this.status == 200) {
+                console.log(this.responseText);
                 var response = JSON.parse(this.responseText);
                 document.getElementById("output").innerHTML = "<table><tr><th>Id</th><td>" + response.ID + "</td></tr>" +
                     "<tr><th>Party Size</th><td>" + response.Size + "</td></tr>" +
@@ -50,7 +53,7 @@ function book(time, size) {
                 document.getElementById("status").innerHTML = "Reservation confirmed for phone booking, ref: " + response.ID;
             }
         };
-        xhttp.open("POST", "https://msjhgasjyb.execute-api.eu-west-2.amazonaws.com/beta/demo/website", true);
+        xhttp.open("POST", url, true);
         xhttp.setRequestHeader("Content-type", "application/json");
 
         xhttp.send({Email:email, Size:size, Date:convertToISODate(date), Time:time});
@@ -62,7 +65,9 @@ function book(time, size) {
     {
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
+            console.log("Status: " + this.status);
             if (this.readyState == 4 && this.status == 200) {
+                console.log(this.responseText);
 //                alert(this.responseText);
                 var response = JSON.parse(this.responseText);
 //                alert("Booking " + size + " on " + date + " at " + time + " for " + email);
@@ -75,7 +80,7 @@ function book(time, size) {
                 document.getElementById("status").innerHTML = "Reservation confirmed, ref: " + response.ID + ". You will receive a confirmation email shortly.";
             }
         };
-        xhttp.open("POST", "https://msjhgasjyb.execute-api.eu-west-2.amazonaws.com/beta/demo/website", true);
+        xhttp.open("POST", url, true);
         xhttp.setRequestHeader("Content-type", "application/json");
 
         xhttp.send(JSON.stringify({Email:email, Size:size, Date:convertToISODate(date), Time:time}));
@@ -99,7 +104,7 @@ function getBooking() {
             document.getElementById("status").innerHTML = "Booking found";
         }
     };
-    xhttp.open("GET", "https://msjhgasjyb.execute-api.eu-west-2.amazonaws.com/beta/demo/website?ID=" + id + "&Email=" + encodeURIComponent(email), true);
+    xhttp.open("GET", url+"?ID=" + id + "&Email=" + encodeURIComponent(email), true);
     xhttp.setRequestHeader("Content-type", "application/json");
 
     xhttp.send();
@@ -112,16 +117,16 @@ function getTimes() {
         if (this.readyState == 4 && this.status == 200) {
             var response = JSON.parse(this.responseText);
             var len, i, text;
-            len = response.Timeslots.length;
+            len = response.length;
             text = "";
             for (i = 0; i < len; i++) {
-                text += "<tr><td><button onclick=\"book('" + response.Timeslots[i] + "','" + size + "')\">Book for " + response.Timeslots[i] + "</button></td></tr>";
+                text += "<tr><td><button onclick=\"book('" + response[i] + "','" + size + "')\">Book for " + response[i] + "</button></td></tr>";
             }
             document.getElementById("output").innerHTML = "<input type='hidden' id='datepicker' value='" + date + "'><table><tr><td>Email:</td><td><input type='text' id='email'/></td></tr></table><br/><table>" + text + "</table>";
             document.getElementById("status").innerHTML = "" + len + " available slots for " + size + " people on " + date + ". Click on time to book";
         }
     };
-    xhttp.open("GET", "https://msjhgasjyb.execute-api.eu-west-2.amazonaws.com/beta/demo/website?Size=" + size + "&Date=" + convertToISODate(date), true);
+    xhttp.open("GET", url+"?Size=" + size + "&Date=" + convertToISODate(date), true);
     xhttp.setRequestHeader("Content-type", "application/json");
 
     xhttp.send();

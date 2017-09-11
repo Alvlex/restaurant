@@ -22,7 +22,63 @@
             height: 60px;
             overflow: auto;
         }
-    </style>
+        table.details tr:hover {
+            color: white;
+        }
+
+        table.details {
+            border-collapse:collapse;
+        }
+        table.details th {
+            color:black;
+        }
+        table.details td {
+            padding: 0px 10px 0px 10px;
+        }
+        /* Tooltip container */
+        .tooltip td {
+            position: relative;
+        }
+
+        /* Tooltip text */
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            min-width: 180px;
+            background-color: #ff95bf;
+            color: #000;
+            text-align: center;
+            padding: 5px 0;
+            border-radius: 6px;
+
+            /* Position the tooltip text */
+            position: absolute;
+            z-index: 1;
+            top: -5px;
+            bottom:auto;
+            right: 128%;
+
+            /* Fade in tooltip */
+            opacity: 0;
+        }
+
+        /* Tooltip arrow */
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 12px;
+            left: 100%;
+            margin-top: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: transparent transparent transparent #ff95bf;
+        }
+
+
+        /* Show the tooltip text when you mouse over the tooltip container */
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }    </style>
     <head>
         <title>Restaurant Admin</title>
         <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
@@ -50,7 +106,7 @@ function getAdminTimes() {
             document.getElementById("status").innerHTML = "" + len + " available slots for " + size + " people on " + date + ". Click on time to reserve for phone booking";
         }
     };
-    xhttp.open("GET", "https://msjhgasjyb.execute-api.eu-west-2.amazonaws.com/beta/demo/website?Size=" + size + "&Date=" + convertToISODate(date), true);
+    xhttp.open("GET", url+"?Size=" + size + "&Date=" + convertToISODate(date), true);
     xhttp.setRequestHeader("Content-type", "application/json");
 
     xhttp.send();
@@ -73,13 +129,17 @@ function getAll() {
             document.getElementById("status").innerHTML = "" + len + " bookings found for " + date;
         }
     };
-    xhttp.open("GET", "https://msjhgasjyb.execute-api.eu-west-2.amazonaws.com/beta/demo/website?Date=" + convertToISODate(date), true);
+    xhttp.open("GET", url+"?Date=" + convertToISODate(date), true);
     xhttp.setRequestHeader("Content-type", "application/json");
 
     xhttp.send();
 }
+function changeDate() {
+    applyBookings();
+}
 function setToday() {
     document.getElementById("datepicker").value = $.datepicker.formatDate( "dd MM yy", new Date());
+    applyBookings();
 }
 
 function setDatePicker(id) {
@@ -87,13 +147,13 @@ function setDatePicker(id) {
     $( id ).datepicker( "option", "dateFormat", "dd MM yy" );
     $( id ).datepicker( "option", "minDate", 0);
 //    $( id ).datepicker( "option", "maxDate", new Date(2017, 7, 20) );
-    setToday();
 }
 function init() {
-
     initData();
     addKey(0,481);
     setDatePicker("#datepicker");
+    setToday();
+
     addCanvasEvents();
     inside();
 
@@ -107,16 +167,13 @@ function logme(id) {
     </head>
     <body onload="init()">
     <h1>Restaurant Admin Interface</h1>
-    <table><tr><td>Date:</td><td><input type='text' name='selected_date' id='datepicker'/></td>
+    <table><tr><td>Date:</td><td><input type='text' name='selected_date' id='datepicker' onchange='changeDate()'/></td>
         <td><button onclick='setToday()'>Today</button></td>
         <td><button onclick='getAll()'>Show All Bookings</button></td>
         <td><button onclick='inside()'>View Inside</button></td>
         <td><button onclick='outside()'>View Outside</button></td></tr>
-        <tr><td colspan='5' rowspan='4'><canvas width='500' height='525' id='floorplan'  style='border:1px solid #d3d3d3;'>You must use a supported browser, such as Chrome</canvas></td>
-            <td id='detail_table_id'>Table Number: 4</td></tr>
-        <tr><td>blah</td></tr>
-        <tr><td id='detail_time'>Time: 18:30</td></tr>
-        <tr><td>Comment: blah</td></tr>
+        <tr><td colspan='5'><canvas width='500' height='525' id='floorplan'  style='border:1px solid #d3d3d3;'>You must use a supported browser, such as Chrome</canvas></td>
+            <td id='table_bookings' colspan='2' style='vertical-align:top'>Table Number: 4</td></tr>
     </table>
     <table id="Table1", class="table1">
     </table>

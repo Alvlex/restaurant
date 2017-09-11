@@ -10,18 +10,22 @@ var selected = 0;
 var room = 0; // 0 inside, 1 outside
 
 var day_bookings = [];
+var table_bookings = []
+var colour_comment = "#ff95bf";
+var colour_booking = "#24c12e";
+var colour_empty = "#bebebe";
 
 function setColour(tables) {
     tables.forEach(function (table) {
-        table.colour = "#bebebe";
-        if (table.id in day_bookings)
+        table.colour = colour_empty;
+        if (table.id in table_bookings)
         {
-            day_bookings[table.id].forEach(function(booking) {
+            table_bookings[table.id].forEach(function(booking) {
                 if (booking.comment !== "") {
-                    table.colour = "#ff95bf";
+                    table.colour = colour_comment;
                 }
-                else if (table.colour === "#bebebe") {
-                    table.colour = "#24c12e";
+                else if (table.colour === colour_empty) {
+                    table.colour = colour_booking;
                 }
             });
         }
@@ -29,15 +33,62 @@ function setColour(tables) {
 
 }
 function applyBookings() {
-    day_bookings = [];
-    day_bookings[3] = [{comment:"Book table 1"},{comment:"Book table 1"},{comment:""}];
-    day_bookings[4] = [{comment:""},{comment:"Book table 1"},{comment:""}];
-    day_bookings[52] = [{comment:""},{comment:""},{comment:""}];
-    day_bookings[6] = [{comment:"Book table 1"}];
-    day_bookings[7] = [{comment:""}];
+    var date = document.getElementById("datepicker").value;
+
+    console.log("Loading bookings for " + date);
+
+    day_bookings = [
+        {table:3,time:"17:30",comment:"Book table 1",size:2,name:"Paul Vanlint", email:"paul@polyzing.com"},
+        {table:3,time:"19:30",comment:"Book table 1",size:2,name:"Alex Vanlint", email:"paul@polyzing.com"},
+        {table:3,time:"22:00",comment:"",size:2,name:"William Vanlint", email:"paul@polyzing.com"},
+        {table:4,time:"18:30",comment:"",size:2,name:"Lizzy Vanlint", email:"paul@polyzing.com"},
+        {table:4,time:"20:30",comment:"Book table 1",size:2,name:"Tamara Vanlint", email:"paul@polyzing.com"},
+        {table:52,time:"18:00",comment:"",size:2,name:"John Smith", email:"paul@polyzing.com"},
+        {table:52,time:"20:00",comment:"",size:2,name:"Paul Smith", email:"paul@polyzing.com"},
+        {table:52,time:"22:00",comment:"",size:2,name:"George Smith", email:"paul@polyzing.com"},
+        {table:6,time:"18:30",comment:"Really big comment, can we have it wrap? Perhaps it might be too big, when specified as a single sentence.",size:2,name:"Ringo Smith", email:"paul@polyzing.com"},
+        {table:7,time:"20:30",comment:"",size:2,name:"Brian Epstein", email:"paul@polyzing.com"},
+    ]
+
+    table_bookings = [];
+    day_bookings.forEach(function(item) {
+        if (!(item.table in table_bookings)) {
+            table_bookings[item.table] = [];
+        }
+        table_bookings[item.table].push(item);
+    });
+//    day_bookings[3] = [{comment:"Book table 1"},{comment:"Book table 1"},{comment:""}];
+//    day_bookings[4] = [{comment:""},{comment:"Book table 1"},{comment:""}];
+//    day_bookings[52] = [{comment:""},{comment:""},{comment:""}];
+//    day_bookings[6] = [{comment:"Book table 1"}];
+//    day_bookings[7] = [{comment:""}];
 
     setColour(insideTables);
     setColour(outsideTables);
+}
+
+function showDetail(time) {
+
+}
+
+function renderTableBookings(bookings) {
+    var text = "";
+    var colour;
+    bookings.forEach(function(item) {
+        if (item.size === 0) {
+            text += "<tr style='background-color: " + colour_empty + ";'><td>" + item.time + "</td><td>Empty</td></tr>";
+        }
+        else if (item.comment === "") {
+            text += "<tr onmousedown='showDetail(" + item.time + ")' style='background-color: " + colour_booking + ";'><td>" +
+                item.time + "</td><td>" + item.size + "</td></tr>";
+        }
+        else {
+            text += "<tr class='tooltip' onmousedown='showDetail(" + item.time + ")' style='background-color: " + colour_comment + ";'><td>" +
+                item.time + "<span class='tooltiptext'>" + item.comment + "</span></td><td>" + item.size + "</td></tr>";
+        }
+    });
+    document.getElementById("table_bookings").innerHTML = "<table class='details'><tr><th>Time</th><th>Size</th></tr><tr id='container'></tr>" + text + "</table>";
+
 }
 
 var xmlhttp = new XMLHttpRequest();
@@ -157,25 +208,23 @@ function initData() {
         else if (outsideTables[j].type === "R4") outsideTables[j].width = 70;
         else if (outsideTables[j].type === "R6") outsideTables[j].width = 80;
     }
-
-    applyBookings();
 }
 
 function addKey(x, y) {
     var ctx = document.getElementById('floorplan').getContext('2d');
     ctx.beginPath();
 
-    ctx.fillStyle="#ff95bf";
+    ctx.fillStyle=colour_comment;
     ctx.fillRect(x,y,10,10);
     ctx.fillStyle="#000000";
     ctx.fillText("Bookings with comments", x+15, y+10);
     y+= 15;
-    ctx.fillStyle="#24c12e";
+    ctx.fillStyle=colour_booking;
     ctx.fillRect(x,y,10,10);
     ctx.fillStyle="#000000";
     ctx.fillText("Bookings without comments", x+15, y+10);
     y+= 15;
-    ctx.fillStyle="#bebebe";
+    ctx.fillStyle=colour_empty;
     ctx.fillRect(x,y,10,10);
     ctx.fillStyle="#000000";
     ctx.fillText("No bookings yet", x+15, y+10);
@@ -362,10 +411,21 @@ function render() {
         if (selected === item.count) {
             ctx.rect(item.x, item.y, item.width, item.height);
             ctx.stroke();
+            if (item.count in table_bookings) renderTableBookings(table_bookings[item.count]);
+            else renderTableBookings([]);
+            //[
+//                {time:"18:00", size:0, comment:""},
+//                {time:"18:30", size:2, comment:""},
+//                {time:"20:00", size:2, comment:"Really big comment, can we have it wrap? Perhaps it might be too big, when specified as a single sentence ..................................."},
+//                {time:"22:00", size:2, comment:"Table 5 please"}]);
+//            xmlhttp.open("GET", url+"?Table=" + (item.count - 1).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + "&Date=" + convertToISODate(document.getElementById("datepicker").value), true);
             xmlhttp.open("GET", "https://msjhgasjyb.execute-api.eu-west-2.amazonaws.com/beta?Table=" + (item.count - 1).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + "&Date=" + convertToISODate(document.getElementById("datepicker").value), true);
             xmlhttp.send();
         }
     });
+    if (selected === 0) {
+        document.getElementById("table_bookings").innerHTML = "";
+    }
 }
 function inside() {
     room=0;
@@ -388,10 +448,6 @@ function addCanvasEvents() {
 
         var mx=parseInt(e.pageX - parentOffset.left);
         var my=parseInt(e.pageY - parentOffset.top);
-//        document.getElementById("xypage").innerHTML = "Page: " + e.pageX + "," + e.pageY;
-//        document.getElementById("xyclient").innerHTML = "Client: " + e.clientX + "," + e.clientY;
-//        document.getElementById("xyscreen").innerHTML = "Screen: " + e.screenX + "," + e.screenY;
-//        document.getElementById("xyparent").innerHTML = "Parent: " + parentOffset.left + "," + parentOffset.top;
 
         selected = 0;
         var tables = (room===0)?insideTables:outsideTables;
@@ -403,7 +459,6 @@ function addCanvasEvents() {
         });
         document.getElementById("Table1").innerHTML = "";
         render();
-//        console.log("Mousedown at " + mx + ", " + my+ ", selected = " + selected);
     }, true);
 }
 
