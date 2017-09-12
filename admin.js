@@ -88,7 +88,7 @@ function applyBookings() {
 
     table_bookings.forEach(function(item) {
         item.forEach(function (entry) {
-            console.log( entry.id + ", " + entry.time);
+            console.log( entry.table + ", " + entry.time);
         });
     });
 

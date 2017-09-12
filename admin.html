@@ -149,10 +149,19 @@ function setToday() {
 }
 
 function setDatePicker(id) {
+    var month_offset = 3;
+    var end_date = new Date();
+    if (end_date.getMonth() > (11 - month_offset)) {
+        end_date.setFullYear(end_date.getYear()+1, end_date.getMonth()+month_offset-12);
+    }
+    else {
+        end_date.setMonth(end_date.getMonth()+month_offset);
+    }
+    //console.log(month_offset + " months out = " + end_date);
     $( id ).datepicker();
     $( id ).datepicker( "option", "dateFormat", "dd MM yy" );
     $( id ).datepicker( "option", "minDate", 0);
-//    $( id ).datepicker( "option", "maxDate", new Date(2017, 7, 20) );
+    $( id ).datepicker( "option", "maxDate", end_date );
     $( id ).datepicker( "option", "beforeShowDay", function(date) {
         var time = date.getTime();
         for (var i = 0; i < excluded_days.length; i++) {
