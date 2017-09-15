@@ -14,6 +14,7 @@ var table_bookings = []
 var colour_comment = "#ff95bf";
 var colour_booking = "#24c12e";
 var colour_empty = "#bebebe";
+var colour_unavailable = "#be98a1";
 
 var excluded_days = [];
 
@@ -159,8 +160,11 @@ function renderTableBookings(bookings) {
                     }
                 }
             }
-            while (next_timeslot < item.time) {
+            while (next_timeslot < item.time-5) {
                 text += "<tr style='background-color: " + colour_empty + ";'><td>" + times[next_timeslot++] + "</td><td>Empty</td></tr>";
+            }
+            while (next_timeslot < item.time) {
+                text += "<tr style='background-color: " + colour_unavailable + ";'><td>" + times[next_timeslot++] + "</td><td>Unavailable</td></tr>";
             }
             if (item.time in times) {
                 timestr = times[item.time];
