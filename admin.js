@@ -189,12 +189,14 @@ function renderTableBookings(bookings) {
             text += "<tr style='background-color: " + colour_empty + ";'><td>" + times[next_timeslot++] + "</td><td>Empty</td></tr>";
         }
         if ((hours.length === 4) && (last_timeslot !== hours[3])) {
+            // Switch from lunch to dinner
             text += "<tr style='background-color: white; height: 10px;'><td></td><td></td></tr>";
             next_timeslot = hours[2];
             last_timeslot = hours[3];
         }
     }
     else if ((hours.length === 4) && (last_timeslot !== hours[3])) {
+        // Switch from lunch to dinner
         next_timeslot = hours[2];
         last_timeslot = hours[3];
         if (current_timeslot > next_timeslot) {
