@@ -143,8 +143,12 @@ function renderTableBookings(bookings) {
 
     bookings.forEach(function(item) {
         if (item.time + 6 > current_timeslot) {
-            if (item.time > last_timeslot) {
+            // Next item is still viewable
+            // Check hours.length and last_timeslot, to allow potential late booking
+            if ((item.time > last_timeslot) && (hours.length === 4) && (last_timeslot !== hours[3])) {
+                // Next item is in next sitting
                 if (current_timeslot <= last_timeslot) {
+                    // And slots at end of previous sitting are still viewable
                     while (next_timeslot <= last_timeslot) {
                         text += "<tr style='background-color: " + colour_empty + ";'><td>" + times[next_timeslot++] + "</td><td>Empty</td></tr>";
                     }
