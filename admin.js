@@ -108,6 +108,29 @@ function showDetail(time) {
 
 }
 
+function isToday() {
+    var now = new Date();
+    var nowtime;
+    if (now.getHours() < 2) {
+        // Up to 2am, now counts as end of previous day
+        nowtime = now.setHours(0,0,0,0);
+        nowtime -= 86400000;
+    }
+    else {
+        nowtime = now.setHours(0,0,0,0);
+    }
+
+    if (date.getTime() === nowtime) {
+        if (current_timeslot > next_timeslot) {
+            next_timeslot = current_timeslot;
+        }
+    }
+    else {
+        current_timeslot = 0;
+    }
+
+}
+
 function renderTableBookings(bookings) {
     console.log("renderTableBookings for " + bookings.length);
     var text = "";
@@ -280,7 +303,9 @@ function initData() {
         console.log("Time: " + item);
     });
 
+    excluded_days.push((new Date(2017,8,21)).getTime());
     excluded_days.push((new Date(2017,8,23)).getTime());
+    excluded_days.push((new Date(2017,9,10)).getTime());
     excluded_days.push((new Date(2017,11,25)).getTime());
 
 //    date = new Date(2017,9,20);

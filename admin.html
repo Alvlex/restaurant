@@ -134,18 +134,95 @@ function getAll() {
 
     xhttp.send();
 }
+function isToday() {
+    var date = new Date(document.getElementById("datepicker").value);
+    var now = new Date();
+    var nowtime;
+    if (now.getHours() < 2) {
+        // Up to 2am, now counts as end of previous day
+        nowtime = now.setHours(0,0,0,0);
+        nowtime -= 86400000;
+    }
+    else {
+        nowtime = now.setHours(0,0,0,0);
+    }
+    console.log(date.getTime());
+    console.log(nowtime);
+    console.log(now.getHours());
+
+    return (date.getTime() === nowtime);
+}
+
+function isExcludedDay(time) {
+    var i;
+    for (i = 0; i < excluded_days.length; i++) {
+        if (excluded_days[i] === time) return true;
+    }
+    return false;
+}
+
+function skipExcludedDays(time) {
+    while (isExcludedDay(time)) {
+        time += 86400000;
+    }
+    return time;
+    /*
+    var i;
+    var skipped;
+    do {
+        skipped = false;
+        for (i = 0; i < excluded_days.length; i++) {
+            console.log("Checking " + i);
+            if (excluded_days[i] === time) {
+                time += 86400000;
+                skipped = true;
+                console.log("Found at " + i);
+                break;
+            }
+        }
+    } while (skipped);
+    return time;
+    */
+}
+
 function changeDate() {
+    var date = new Date(document.getElementById("datepicker").value);
+    var msg=(isExcludedDay(date.getTime())?"This date is blocked out for an event":"");
+    document.getElementById("msg").innerHTML = msg;
+    if (isToday()) {
+        document.getElementById("forcedate").innerHTML = "<button onclick='setTomorrow()'>Tomorrow</button>";
+    }
+    else {
+        document.getElementById("forcedate").innerHTML = "<button onclick='setToday()'>Today</button>";
+    }
+
     applyBookings();
     inside();
 }
+
 function setToday() {
     var now = new Date();
-    if (now.getHours < 2) {
-        now -= 86400000;
+    if (now.getHours() < 2) {
+        now.setTime(now.getTime() - 86400000);
     }
     document.getElementById("datepicker").value = $.datepicker.formatDate( "dd MM yy", now);
-    applyBookings();
-    inside();
+    changeDate();
+}
+
+function setNext() {
+    var date = new Date(document.getElementById("datepicker").value);
+    date.setTime(skipExcludedDays(date.getTime() + 86400000));
+    document.getElementById("datepicker").value = $.datepicker.formatDate( "dd MM yy", date);
+    changeDate();
+}
+
+function setTomorrow() {
+    var now = new Date();
+    if (now.getHours() >= 2) {
+        date.setTime(skipExcludedDays(date.getTime() + 86400000));
+    }
+    document.getElementById("datepicker").value = $.datepicker.formatDate( "dd MM yy", now);
+    changeDate();
 }
 
 function setDatePicker(id) {
@@ -189,8 +266,10 @@ function logme(id) {
     </head>
     <body onload="init()">
     <h1>Restaurant Admin Interface</h1>
-    <table><tr><td>Date:</td><td><input type='text' name='selected_date' id='datepicker' onchange='changeDate()'/></td>
-        <td><button onclick='setToday()'>Today</button></td>
+    <p id='msg'></p>
+    <table><tr><td>Date:</td><td><input type='text' name='selected_date' id='datepicker' onchange='changeDate()'/>
+            <button onclick='setNext()'>&gt;&gt;</button></td>
+        <td id='forcedate'><button onclick='setToday()'>Today</button></td>
         <td><button onclick='getAll()'>Show All Bookings</button></td>
         <td><button onclick='inside()'>View Inside</button></td>
         <td><button onclick='outside()'>View Outside</button></td></tr>
