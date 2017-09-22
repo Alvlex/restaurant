@@ -163,31 +163,17 @@ function isExcludedDay(time) {
 
 function skipExcludedDays(time) {
     while (isExcludedDay(time)) {
+        console.log("Skipping day");
         time += 86400000;
     }
     return time;
-    /*
-    var i;
-    var skipped;
-    do {
-        skipped = false;
-        for (i = 0; i < excluded_days.length; i++) {
-            console.log("Checking " + i);
-            if (excluded_days[i] === time) {
-                time += 86400000;
-                skipped = true;
-                console.log("Found at " + i);
-                break;
-            }
-        }
-    } while (skipped);
-    return time;
-    */
 }
 
 function changeDate() {
     var date = new Date(document.getElementById("datepicker").value);
-    var msg=(isExcludedDay(date.getTime())?"This date is blocked out for an event":"");
+    var msg=(isExcludedDay(date.getTime())
+        ?"<span style='background-color:red;color:white;'>This date is blocked out for an event </span><button onclick='cancelEvent()'>Cancel Event</button>"
+        :"");
     document.getElementById("msg").innerHTML = msg;
     if (isToday()) {
         document.getElementById("forcedate").innerHTML = "<button onclick='setTomorrow()'>Tomorrow</button>";
@@ -211,17 +197,19 @@ function setToday() {
 
 function setNext() {
     var date = new Date(document.getElementById("datepicker").value);
-    date.setTime(skipExcludedDays(date.getTime() + 86400000));
+//    date.setTime(skipExcludedDays(date.getTime() + 86400000));
+    date.setTime(date.getTime() + 86400000);
     document.getElementById("datepicker").value = $.datepicker.formatDate( "dd MM yy", date);
     changeDate();
 }
 
 function setTomorrow() {
-    var now = new Date();
-    if (now.getHours() >= 2) {
-        date.setTime(skipExcludedDays(date.getTime() + 86400000));
+    var date = new Date();
+    if (date.getHours() >= 2) {
+//        date.setTime(skipExcludedDays(date.setHours(0,0,0,0) + 86400000));
+        date.setTime(date.setHours(0,0,0,0) + 86400000);
     }
-    document.getElementById("datepicker").value = $.datepicker.formatDate( "dd MM yy", now);
+    document.getElementById("datepicker").value = $.datepicker.formatDate( "dd MM yy", date);
     changeDate();
 }
 
@@ -274,7 +262,8 @@ function logme(id) {
         <td><button onclick='inside()'>View Inside</button></td>
         <td><button onclick='outside()'>View Outside</button></td></tr>
         <tr><td colspan='5' style='vertical-align:top'><canvas width='500' height='525' id='floorplan'  style='border:1px solid #d3d3d3;'>You must use a supported browser, such as Chrome</canvas></td>
-            <td id='table_bookings' colspan='2' style='vertical-align:top'></td></tr>
+            <td style='vertical-align:top;height:100;'><div style='overflow:auto;height:100;' id='table_bookings'></div></td>
+            <td style='vertical-align:top;'><div id='booking_detail'></div></td></tr>
     </table>
     <table id="Table1", class="table1">
     </table>

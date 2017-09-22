@@ -98,14 +98,30 @@ function applyBookings() {
 }
 
 function showDetail(time) {
+    var detail="";
     if (selected in table_bookings) {
         if (time in table_bookings[selected]) {
             var item = table_bookings[selected][time];
+            detail = "<table><tr height='10'></tr><tr><td>Name</td><td>" + item.name +
+                "</td></tr><tr><td>Email</td><td>" + item.email +
+                "</td></tr><tr><td>Party Size</td><td>" + item.size +
+                "</td></tr><tr><td>Table</td><td>" + item.table +
+                "</td></tr><tr><td>Comment</td><td>" + item.comment +
+                "</td></tr><tr><td>Time</td><td>" + item.time + "</td></tr></table>";
+
             console.log("Showing entry for " + time);
             console.log(item);
         }
     }
+    document.getElementById("booking_detail").innerHTML = detail;
+}
 
+function bookAdmin(time, warn) {
+    document.getElementById("booking_detail").innerHTML = "";
+    if (warn && !confirm("Note that " + time + " is too close to a later booking. Do you want to proceed anyway and book up to the next seating?")) {
+        return;
+    }
+    console.log("Book for " + time);
 }
 
 function isToday() {
@@ -173,7 +189,8 @@ function renderTableBookings(bookings) {
                 if (current_timeslot <= last_timeslot) {
                     // And slots at end of previous sitting are still viewable
                     while (next_timeslot <= last_timeslot) {
-                        text += "<tr style='background-color: " + colour_empty + ";'><td>" + times[next_timeslot++] + "</td><td>Empty</td></tr>";
+                        text += "<tr onmousedown='bookAdmin(\"" + times[next_timeslot] + "\",0)' style='background-color: " + colour_empty + ";'><td>" + times[next_timeslot] + "</td><td>Empty</td></tr>";
+                        next_timeslot++;
                     }
                     text += "<tr style='background-color: white; height: 10px;'><td></td><td></td></tr>";
                     next_timeslot = hours[2];
@@ -188,10 +205,12 @@ function renderTableBookings(bookings) {
                 }
             }
             while (next_timeslot < item.time-5) {
-                text += "<tr style='background-color: " + colour_empty + ";'><td>" + times[next_timeslot++] + "</td><td>Empty</td></tr>";
+                text += "<tr onmousedown='bookAdmin(\"" + times[next_timeslot] + "\",0)' style='background-color: " + colour_empty + ";'><td>" + times[next_timeslot] + "</td><td>Empty</td></tr>";
+                next_timeslot++;
             }
             while (next_timeslot < item.time) {
-                text += "<tr style='background-color: " + colour_unavailable + ";'><td>" + times[next_timeslot++] + "</td><td>Unavailable</td></tr>";
+                text += "<tr onmousedown='bookAdmin(\"" + times[next_timeslot] + "\",1)' style='background-color: " + colour_unavailable + ";'><td>" + times[next_timeslot] + "</td><td>Unavailable</td></tr>";
+                next_timeslot++;
             }
             if (item.time in times) {
                 timestr = times[item.time];
@@ -213,7 +232,8 @@ function renderTableBookings(bookings) {
     });
     if (current_timeslot <= last_timeslot) {
         while (next_timeslot <= last_timeslot) {
-            text += "<tr style='background-color: " + colour_empty + ";'><td>" + times[next_timeslot++] + "</td><td>Empty</td></tr>";
+            text += "<tr onmousedown='bookAdmin(\"" + times[next_timeslot] + "\",0)' style='background-color: " + colour_empty + ";'><td>" + times[next_timeslot] + "</td><td>Empty</td></tr>";
+            next_timeslot++;
         }
         if ((hours.length === 4) && (last_timeslot !== hours[3])) {
             // Switch from lunch to dinner
@@ -231,9 +251,11 @@ function renderTableBookings(bookings) {
         }
     }
     while (next_timeslot <= last_timeslot) {
-        text += "<tr style='background-color: " + colour_empty + ";'><td>" + times[next_timeslot++] + "</td><td>Empty</td></tr>";
+        text += "<tr onmousedown='bookAdmin(\"" + times[next_timeslot] + "\",0)' style='background-color: " + colour_empty + ";'><td>" + times[next_timeslot] + "</td><td>Empty</td></tr>";
+        next_timeslot++;
     }
     document.getElementById("table_bookings").innerHTML = "<table class='details'><tr><th>Time</th><th>Name</th></tr><tr id='container'></tr>" + text + "</table>";
+    document.getElementById("booking_detail").innerHTML = "";
 
 }
 
