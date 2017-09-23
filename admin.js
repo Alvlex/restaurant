@@ -39,6 +39,34 @@ function setColour(tables) {
     });
 
 }
+
+function parseResponse(msg) {
+    var tmp = JSON.parse(msg);
+    day_bookings = [];
+    table_bookings = [];
+    tmp.bookings.forEach(function(item) {
+        day_bookings[item.ID] = item;
+    });
+    tmp.tables.forEach(function(item) {
+        var table = parseInt(item.TableNo_Slot.slice(0,2));
+        var slot = parseInt(item.TableNo_Slot.slice(3,5));
+        console.log(item.TableNo_Slot + " => " + item.TableNo_Slot.slice(0,2) + " : " + item.TableNo_Slot.slice(3,5))
+        var id = item.Booking_Ref;
+        var booking = day_bookings[id];
+        console.log("Adding entry for table " + table + " at " + slot + ":" + times[slot]);
+        if (!(item.table in table_bookings)) {
+            table_bookings[table] = [];
+        }
+        var entry = { table:table, time:slot, comment:"test", size:booking.Size, name:"Me", email:booking.Email};
+
+        table_bookings[table][slot] = entry;
+    });
+
+    setColour(insideTables);
+    setColour(outsideTables);
+
+}
+
 function applyBookings() {
     var date = new Date(document.getElementById("datepicker").value);
 
@@ -61,7 +89,80 @@ function applyBookings() {
 
 
     console.log("Loading bookings for " + date + " - day " + date.getDay());
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        console.log("Status: " + this.status);
+        if (this.readyState == 4 && this.status == 200) {
+            console.log(this.responseText);
+            var response = JSON.parse(this.responseText);
+            parseResponse(this.responseText);
+        }
+        inside();
+    };
+    xhttp.open("GET", "https://msjhgasjyb.execute-api.eu-west-2.amazonaws.com/beta/demo/website?Date=2017-08-27", true);
+    xhttp.setRequestHeader("Content-type", "application/json");
 
+    xhttp.send();
+
+
+    /*
+     var msg = '{"bookings":[{"id":549, "name":"Alex Vanlint","email":"m0011369@gmail.com", "size":3, "time":"12:15", "comment":"Multi-tables 15 & 18"},\
+     {"id":389, "name":"Paul Vanlint","email":"paul@polyzing.com", "size":3, "time":"12:00"},\
+     {"id":479, "name":"Sparky Vanlint","email":"sparky@polyzing.com", "size":3, "time":"12:00"}],\
+     "tables":[{"id":389,"table":"05-00"},\
+     {"id":479,"table":"06-00"},\
+     {"id":549,"table":"07-01"}]}';
+     */
+
+
+    var msg = '{\
+    "bookings": [\
+        {\
+            "Date": "2017-08-27",\
+            "Time": "12:15",\
+            "ID": 549,\
+            "Email": "m0011369@gmail.com",\
+            "Size": 3\
+        },\
+        {\
+            "Date": "2017-08-27",\
+            "Time": "12:00",\
+            "ID": 389,\
+            "Email": "m0011369@gmail.com",\
+            "Size": 3\
+        },\
+        {\
+            "Date": "2017-08-27",\
+            "Time": "12:00",\
+            "ID": 479,\
+            "Email": "m0011369@gmail.com",\
+            "Size": 3\
+        }\
+    ],\
+        "tables": [\
+        {\
+            "Booking_Ref": 389,\
+            "Date": "2017-08-27",\
+            "TableNo_Slot": "05-00",\
+            "Size": 4\
+        },\
+        {\
+            "Booking_Ref": 479,\
+            "Date": "2017-08-27",\
+            "TableNo_Slot": "06-00",\
+            "Size": 4\
+        },\
+        {\
+            "Booking_Ref": 549,\
+            "Date": "2017-08-27",\
+            "TableNo_Slot": "07-01",\
+            "Size": 6\
+        }\
+    ]\
+}';
+
+    //parseResponse(msg);
+    /*
     day_bookings = [
         {table:3,time:22,comment:"Book table 1",size:2,name:"Paul Vanlint", email:"paul@polyzing.com"},
         {table:52,time:24,comment:"",size:2,name:"John Smith", email:"paul@polyzing.com"},
@@ -92,9 +193,7 @@ function applyBookings() {
             console.log( entry.table + ", " + entry.time);
         });
     });
-
-    setColour(insideTables);
-    setColour(outsideTables);
+*/
 }
 
 function showDetail(time) {
@@ -109,7 +208,7 @@ function showDetail(time) {
                 "</td></tr><tr><td>Comment</td><td>" + item.comment +
                 "</td></tr><tr><td>Time</td><td>" + item.time + "</td></tr></table>";
 
-            console.log("Showing entry for " + time);
+            console.log("Showing entry for " + times[time]);
             console.log(item);
         }
     }
